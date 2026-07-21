@@ -88,7 +88,7 @@ h2{font-size:clamp(34px,5vw,58px);font-weight:700;letter-spacing:-.03em;line-hei
 .dev.cat-on{transform:translate(-50%,-50%) scale(1.55);z-index:25}
 .dev.cat-dim{opacity:.18}
 .tip{display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:205px;background:rgba(29,29,31,.96);backdrop-filter:blur(8px);color:#fff;border-radius:11px;padding:10px 13px;z-index:30;box-shadow:0 10px 28px rgba(0,0,0,.32)}
-.dev:hover .tip,.dev:focus .tip,.dev:focus-within .tip{display:block}
+.dev:hover .tip,.dev:focus-visible .tip,.dev.open .tip{display:block}
 .tipimg{width:100%;height:104px;object-fit:contain;background:#fff;border-radius:8px;margin-bottom:8px;display:block}
 .tip b{display:block;font-size:13px;letter-spacing:-.01em;margin-bottom:3px}
 .tip span{display:block;font-size:11.5px;color:#b9b9c0;line-height:1.45}
@@ -397,6 +397,24 @@ document.querySelectorAll('.dev[data-hl]').forEach(el=>{
   const on=()=>hl.classList.add('on'), off=()=>hl.classList.remove('on');
   el.addEventListener('mouseenter',on); el.addEventListener('mouseleave',off);
   el.addEventListener('focus',on); el.addEventListener('blur',off);
+});
+// click a dot to toggle its tooltip; click anywhere else to dismiss it
+document.querySelectorAll('.dev').forEach(el=>{
+  el.addEventListener('click', e=>{
+    if(document.body.classList.contains('editing')) return;
+    if(e.target.closest('a')) return;
+    e.stopPropagation();
+    const open = el.classList.contains('open');
+    document.querySelectorAll('.dev.open').forEach(d=>d.classList.remove('open'));
+    el.classList.toggle('open', !open);
+  });
+});
+document.addEventListener('click', e=>{
+  if(document.body.classList.contains('editing')) return;
+  if(e.target.closest('.dev')) return;
+  document.querySelectorAll('.dev.open').forEach(d=>d.classList.remove('open'));
+  const a=document.activeElement;
+  if(a && a.classList && a.classList.contains('dev')) a.blur();
 });
 if(location.hash==='#edit') setEdit(true);
 window.addEventListener('hashchange',()=>{if(location.hash==='#edit')setEdit(true);});
